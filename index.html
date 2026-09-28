@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NovaStore — Modern Lifestyle & Electronics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- Toast Notification Stack -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full"></div>
+
+  <!-- Announcement Bar -->
+  <header class="bg-indigo-600 dark:bg-indigo-700 text-white text-xs font-medium py-2 px-4 text-center">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <span class="hidden sm:inline">✨ New Season Collection Live!</span>
+      <div class="mx-auto sm:mx-0 flex items-center gap-2">
+        <span>Use code <strong class="bg-white/20 px-1.5 py-0.5 rounded font-mono font-bold tracking-wider">NOVA20</strong> for 20% OFF!</span>
+        <span class="hidden md:inline text-indigo-200">• Free shipping over $100</span>
+      </div>
+      <div class="hidden sm:flex items-center gap-4 text-indigo-100 text-[11px]">
+        <span class="hover:underline cursor-pointer" onclick="app.openAdminModal()">Admin Panel</span>
+        <span>•</span>
+        <a href="#catalog" class="hover:underline">Shop Now</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav class="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 gap-4">
+        
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-8">
+          <a href="#" class="flex items-center gap-2 group">
+            <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/30 group-hover:scale-105 transition-transform">
+              <i data-lucide="sparkles" class="w-5 h-5"></i>
+            </div>
+            <span class="text-xl font-black tracking-tight text-slate-900 dark:text-white">Nova<span class="text-indigo-600 dark:text-indigo-400">Store</span></span>
+          </a>
+
+          <!-- Quick Navigation Links (Desktop) -->
+          <div class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+            <button onclick="app.setCategory('all')" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">All</button>
+            <button onclick="app.setCategory('electronics')" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Electronics</button>
+            <button onclick="app.setCategory('audio')" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Audio</button>
+            <button onclick="app.setCategory('wearables')" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Wearables</button>
+            <button onclick="app.setCategory('fashion')" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Fashion</button>
+            <button onclick="app.setCategory('home')" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Home</button>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="flex-1 max-w-md hidden md:block">
+          <div class="relative">
+            <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              id="search-input" 
+              type="text" 
+              placeholder="Search premium headphones, watches, bags..." 
+              class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all"
+            />
+          </div>
+        </div>
+
+        <!-- Utility Icons & Actions -->
+        <div class="flex items-center gap-3">
+          
+          <!-- Currency Selector -->
+          <div class="relative hidden sm:block">
+            <select 
+              id="currency-select"
+              onchange="window.store.setCurrency(this.value)"
+              class="text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-1.5 px-2.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+            >
+              <option value="USD">USD ($)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="INR">INR (₹)</option>
+            </select>
+          </div>
+
+          <!-- Theme Toggle -->
+          <button 
+            onclick="app.toggleTheme()" 
+            class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="Toggle Light/Dark Theme"
+          >
+            <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+            <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+          </button>
+
+          <!-- Admin Panel Button -->
+          <button 
+            onclick="app.openAdminModal()" 
+            class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors hidden sm:flex items-center gap-1.5 text-xs font-semibold"
+            title="Admin Dashboard"
+          >
+            <i data-lucide="sliders" class="w-4 h-4"></i>
+            <span>Admin</span>
+          </button>
+
+          <!-- User Authentication Section (Login / Profile) -->
+          <div id="header-auth-container" class="flex items-center"></div>
+
+          <!-- Wishlist Button -->
+          <button 
+            onclick="app.openWishlist()" 
+            class="relative p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="Saved Items"
+          >
+            <i data-lucide="heart" class="w-5 h-5"></i>
+            <span id="wishlist-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">0</span>
+          </button>
+
+          <!-- Cart Button -->
+          <button 
+            id="header-cart-btn"
+            onclick="app.openCart()" 
+            class="relative px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-md shadow-indigo-600/25"
+            title="Shopping Cart"
+          >
+            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Cart</span>
+            <span id="cart-badge" class="hidden px-1.5 py-0.2 bg-white text-indigo-600 rounded-full font-bold text-[11px]">0</span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Search Bar -->
+  <div class="p-3 bg-white dark:bg-slate-850 border-b border-slate-200 dark:border-slate-800 md:hidden">
+    <div class="relative">
+      <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+      <input 
+        type="text" 
+        oninput="window.store.setFilter('search', this.value)"
+        placeholder="Search products..." 
+        class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400"
+      />
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-b from-indigo-50/50 via-slate-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-850 border-b border-slate-200/60 dark:border-slate-800 py-12 md:py-16 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/80 text-indigo-700 dark:text-indigo-300 text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+            Premium Lifestyle Redefined • 2026 Collection
+          </div>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15]">
+            Crafted for <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500">Everyday Excellence.</span>
+          </h1>
+          <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
+            Discover precision-engineered audio, luxury Italian leather goods, ergonomic mechanical gear, and smart living essentials.
+          </p>
+          <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+            <a href="#catalog" class="px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 transition-all active:scale-95 flex items-center gap-2">
+              <span>Shop Collection</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+            <button onclick="app.openQuickView('prod-1')" class="px-6 py-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-800 dark:text-slate-200 font-semibold text-sm shadow-xs transition-all flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4 text-indigo-500"></i>
+              <span>Featured Spotlight</span>
+            </button>
+          </div>
+
+          <!-- Flash Sale Countdown -->
+          <div class="inline-flex items-center gap-4 p-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm mt-4">
+            <div class="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold text-xs">
+              <i data-lucide="flame" class="w-4 h-4"></i> Flash Deal Ends:
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs font-bold text-slate-800 dark:text-slate-100">
+              <span class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded">08h</span>:
+              <span class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded">42m</span>:
+              <span class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded">19s</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Featured Product Showcase Banner Card -->
+        <div class="lg:col-span-5">
+          <div class="relative rounded-3xl overflow-hidden shadow-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 group">
+            <img 
+              src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1000&q=80" 
+              alt="Aura Studio Headphones" 
+              class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex flex-col justify-end p-6 text-white">
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Featured Pick</span>
+              <h3 class="text-xl font-bold mt-1">Aura Noise-Canceling Wireless</h3>
+              <p class="text-xs text-slate-300 mt-1 line-clamp-2">Immersive studio acoustics with hybrid active cancellation.</p>
+              <div class="flex items-center justify-between mt-4">
+                <span class="text-2xl font-extrabold">$279.99</span>
+                <button onclick="app.openQuickView('prod-1')" class="px-4 py-2 bg-white text-slate-900 font-bold text-xs rounded-xl hover:bg-slate-100 transition-colors">
+                  View Details
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 pt-8 border-t border-slate-200/60 dark:border-slate-800">
+        <div class="flex items-center gap-3 p-3 bg-white/60 dark:bg-slate-800/40 rounded-xl">
+          <div class="p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+            <i data-lucide="truck" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Free Fast Shipping</h4>
+            <p class="text-[11px] text-slate-500">On all orders over $100</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 p-3 bg-white/60 dark:bg-slate-800/40 rounded-xl">
+          <div class="p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-slate-900 dark:text-white">2-Year Warranty</h4>
+            <p class="text-[11px] text-slate-500">Official brand coverage</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 p-3 bg-white/60 dark:bg-slate-800/40 rounded-xl">
+          <div class="p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-slate-900 dark:text-white">30-Day Free Returns</h4>
+            <p class="text-[11px] text-slate-500">Hassle-free guarantee</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 p-3 bg-white/60 dark:bg-slate-800/40 rounded-xl">
+          <div class="p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+            <i data-lucide="headphones" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-slate-900 dark:text-white">24/7 Concierge</h4>
+            <p class="text-[11px] text-slate-500">Expert shopping support</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Category Filter Pills Bar -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8" id="catalog">
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+      <button onclick="app.setCategory('all')" data-category="all" class="category-pill px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-xs whitespace-nowrap transition-all">
+        All Products
+      </button>
+      <button onclick="app.setCategory('electronics')" data-category="electronics" class="category-pill px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold whitespace-nowrap hover:border-slate-300 transition-all">
+        Electronics & Gadgets
+      </button>
+      <button onclick="app.setCategory('audio')" data-category="audio" class="category-pill px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold whitespace-nowrap hover:border-slate-300 transition-all">
+        Audio & Sound
+      </button>
+      <button onclick="app.setCategory('wearables')" data-category="wearables" class="category-pill px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold whitespace-nowrap hover:border-slate-300 transition-all">
+        Wearables & Watches
+      </button>
+      <button onclick="app.setCategory('fashion')" data-category="fashion" class="category-pill px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold whitespace-nowrap hover:border-slate-300 transition-all">
+        Fashion & Lifestyle
+      </button>
+      <button onclick="app.setCategory('home')" data-category="home" class="category-pill px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold whitespace-nowrap hover:border-slate-300 transition-all">
+        Home & Living
+      </button>
+    </div>
+  </section>
+
+  <!-- Main Catalog Content: Sidebar + Products Grid -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+      
+      <!-- Filters Sidebar (Desktop) -->
+      <aside class="hidden lg:block bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-6 shadow-sm sticky top-24 space-y-6">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-700">
+          <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+            <i data-lucide="filter" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i> Filters
+          </h3>
+          <button onclick="store.resetFilters()" class="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
+            Reset All
+          </button>
+        </div>
+
+        <!-- Price Slider -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Max Price</label>
+            <span id="price-range-display" class="font-bold text-sm text-indigo-600 dark:text-indigo-400">$2000</span>
+          </div>
+          <input 
+            type="range" 
+            id="price-range" 
+            min="50" 
+            max="2000" 
+            step="25" 
+            value="2000"
+            class="w-full accent-indigo-600 cursor-pointer"
+          />
+          <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+            <span>$50</span>
+            <span>$2,000</span>
+          </div>
+        </div>
+
+        <!-- Minimum Rating -->
+        <div class="pt-4 border-t border-slate-100 dark:border-slate-700/60">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Customer Rating</label>
+          <div class="space-y-1.5 text-xs">
+            <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 transition-colors">
+              <input type="radio" name="min-rating" value="0" checked class="accent-indigo-600" />
+              <span>All Ratings</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 transition-colors">
+              <input type="radio" name="min-rating" value="4.8" class="accent-indigo-600" />
+              <span class="flex items-center gap-1">4.8★ & above</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 transition-colors">
+              <input type="radio" name="min-rating" value="4.5" class="accent-indigo-600" />
+              <span class="flex items-center gap-1">4.5★ & above</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 transition-colors">
+              <input type="radio" name="min-rating" value="4.0" class="accent-indigo-600" />
+              <span class="flex items-center gap-1">4.0★ & above</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- In-Stock Toggle -->
+        <div class="pt-4 border-t border-slate-100 dark:border-slate-700/60">
+          <label class="flex items-center justify-between cursor-pointer">
+            <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">In Stock Items Only</span>
+            <input type="checkbox" id="in-stock-only" class="accent-indigo-600 w-4 h-4 rounded cursor-pointer" />
+          </label>
+        </div>
+
+        <!-- Promotional Promo Box in Sidebar -->
+        <div class="p-4 bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-slate-700/50 dark:to-indigo-950/40 rounded-xl border border-indigo-100 dark:border-indigo-800/40 text-center">
+          <i data-lucide="gift" class="w-6 h-6 mx-auto text-indigo-600 dark:text-indigo-400 mb-1"></i>
+          <h4 class="font-bold text-xs text-slate-900 dark:text-white">Need a discount?</h4>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Use promo code <span class="font-bold font-mono text-indigo-600 dark:text-indigo-400">NOVA20</span> at checkout for 20% off.</p>
+        </div>
+      </aside>
+
+      <!-- Products Grid & Controls -->
+      <section class="lg:col-span-3">
+        <!-- Control Header -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 bg-white dark:bg-slate-800/70 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white">Explore Products</h2>
+            <p id="product-count" class="text-xs text-slate-500">Loading catalog...</p>
+          </div>
+
+          <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+            <!-- Sort dropdown -->
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-slate-400">Sort by:</span>
+              <select id="sort-by" class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-1.5 px-3 font-medium focus:ring-1 focus:ring-indigo-500 focus:outline-none">
+                <option value="featured">Featured</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+                <option value="reviews">Most Reviewed</option>
+                <option value="newest">New Arrivals</option>
+              </select>
+            </div>
+
+            <!-- Grid / List Switcher -->
+            <div class="flex items-center p-1 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+              <button id="view-grid-btn" onclick="app.setViewMode('grid')" class="p-1.5 rounded-lg bg-white dark:bg-slate-700 shadow-xs text-indigo-600 dark:text-indigo-400 transition-all" title="Grid View">
+                <i data-lucide="grid" class="w-4 h-4"></i>
+              </button>
+              <button id="view-list-btn" onclick="app.setViewMode('list')" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 transition-all" title="List View">
+                <i data-lucide="list" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Cards Container -->
+        <div id="product-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <!-- Populated dynamically via UI.renderProducts() -->
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Slide-Over Cart Drawer -->
+  <div id="cart-backdrop" onclick="app.closeCart()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden opacity-0 transition-opacity duration-300"></div>
+  <aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-slate-900 z-50 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out border-l border-slate-200 dark:border-slate-800">
+    <!-- Header -->
+    <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i data-lucide="shopping-bag" class="w-5 h-5 text-indigo-600 dark:text-indigo-400"></i>
+        <h3 class="font-bold text-base text-slate-900 dark:text-white">Your Cart</h3>
+        <span id="cart-drawer-count" class="text-xs text-slate-400">(0 items)</span>
+      </div>
+      <button onclick="app.closeCart()" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Free Shipping Progress -->
+    <div class="px-4 py-3 bg-slate-50 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-800 text-xs">
+      <div id="free-shipping-text" class="text-slate-600 dark:text-slate-400 mb-1.5">
+        Add $100.00 more for Free Shipping
+      </div>
+      <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+        <div id="free-shipping-progress" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Items List -->
+    <div id="cart-items-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+      <!-- Dynamic list -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="cart-empty-state" class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+      <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-3">
+        <i data-lucide="shopping-bag" class="w-8 h-8 stroke-[1.5]"></i>
+      </div>
+      <h4 class="font-bold text-base text-slate-800 dark:text-slate-200">Your bag is empty</h4>
+      <p class="text-xs text-slate-400 mt-1 max-w-xs">Looks like you haven't added anything to your cart yet.</p>
+      <button onclick="app.closeCart()" class="mt-4 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-xl hover:bg-indigo-700 transition-colors">
+        Explore Catalog
+      </button>
+    </div>
+
+    <!-- Footer Checkout Section -->
+    <div id="cart-footer" class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 space-y-3 hidden">
+      <!-- Coupon Box -->
+      <form onsubmit="app.handleApplyCoupon(event)" class="flex gap-2">
+        <input 
+          id="coupon-input" 
+          type="text" 
+          placeholder="Promo code (e.g. NOVA20)" 
+          class="flex-1 px-3 py-1.5 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 uppercase font-mono tracking-wider focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        />
+        <button type="submit" class="px-3.5 py-1.5 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white rounded-xl text-xs font-semibold transition-colors">
+          Apply
+        </button>
+      </form>
+      <div id="applied-coupon-tag" class="hidden"></div>
+
+      <!-- Cost Breakdown -->
+      <div class="space-y-1.5 text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-700">
+        <div class="flex justify-between">
+          <span>Subtotal</span>
+          <span id="cart-subtotal" class="font-semibold text-slate-900 dark:text-white">$0.00</span>
+        </div>
+        <div id="cart-discount-row" class="flex justify-between text-emerald-600 dark:text-emerald-400 hidden">
+          <span>Discount</span>
+          <span id="cart-discount">-$0.00</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Shipping</span>
+          <span id="cart-shipping" class="font-semibold text-slate-900 dark:text-white">$15.00</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Estimated Sales Tax (8%)</span>
+          <span id="cart-tax" class="font-semibold text-slate-900 dark:text-white">$0.00</span>
+        </div>
+        <div class="flex justify-between text-sm font-bold text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-slate-700">
+          <span>Total</span>
+          <span id="cart-total" class="text-indigo-600 dark:text-indigo-400 text-base">$0.00</span>
+        </div>
+      </div>
+
+      <!-- Checkout Button -->
+      <button onclick="app.openCheckout()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all active:scale-95">
+        <i data-lucide="lock" class="w-4 h-4"></i> Proceed to Checkout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Quick View Modal -->
+  <div id="product-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 sm:p-6">
+    <div onclick="app.closeQuickView()" class="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"></div>
+    <div class="relative bg-white dark:bg-slate-800 max-w-3xl w-full rounded-3xl shadow-2xl p-6 md:p-8 z-10 max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-slate-700">
+      <button onclick="app.closeQuickView()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div id="product-modal-content">
+        <!-- Rendered via UI.renderProductModal() -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Wishlist Modal -->
+  <div id="wishlist-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div onclick="app.closeWishlist()" class="fixed inset-0 bg-black/60 backdrop-blur-xs"></div>
+    <div class="relative bg-white dark:bg-slate-800 max-w-lg w-full rounded-3xl shadow-2xl p-6 z-10 max-h-[80vh] overflow-y-auto border border-slate-200 dark:border-slate-700">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-700">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i data-lucide="heart" class="w-5 h-5 text-rose-500 fill-rose-500"></i> Wishlist
+        </h3>
+        <button onclick="app.closeWishlist()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="wishlist-items-list" class="mt-4 space-y-3">
+        <!-- Rendered via UI.renderWishlist() -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Multi-Step Checkout Modal -->
+  <div id="checkout-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 sm:p-6">
+    <div onclick="app.closeCheckout()" class="fixed inset-0 bg-black/60 backdrop-blur-xs"></div>
+    <div class="relative bg-white dark:bg-slate-800 max-w-3xl w-full rounded-3xl shadow-2xl z-10 max-h-[92vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700">
+      
+      <!-- Checkout Header -->
+      <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-850">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white">Secure Checkout</h3>
+            <span class="text-[11px] text-slate-400">256-Bit Encrypted Simulated Gateway</span>
+          </div>
+        </div>
+        <button onclick="app.closeCheckout()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Stepper Indicators -->
+      <div class="flex border-b border-slate-200 dark:border-slate-700 text-xs font-semibold bg-white dark:bg-slate-900">
+        <div id="step-indicator-1" class="flex-1 py-3 text-center border-r border-slate-200 dark:border-slate-700 bg-indigo-600 text-white flex items-center justify-center gap-2">
+          <span>1. Shipping</span>
+        </div>
+        <div id="step-indicator-2" class="flex-1 py-3 text-center border-r border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center gap-2">
+          <span>2. Delivery</span>
+        </div>
+        <div id="step-indicator-3" class="flex-1 py-3 text-center bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center gap-2">
+          <span>3. Payment</span>
+        </div>
+      </div>
+
+      <!-- Checkout Body -->
+      <div class="flex-1 overflow-y-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+          
+          <!-- Steps Content -->
+          <div class="md:col-span-7">
+            
+            <!-- Step 1: Shipping Details -->
+            <div id="checkout-step-1" class="space-y-4">
+              <h4 class="font-bold text-sm text-slate-900 dark:text-white">Shipping Address</h4>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="col-span-2">
+                  <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Full Name</label>
+                  <input id="checkout-name" type="text" value="Jane Doe" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" />
+                </div>
+                <div class="col-span-2">
+                  <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Email Address</label>
+                  <input id="checkout-email" type="email" value="jane.doe@example.com" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" />
+                </div>
+                <div class="col-span-2">
+                  <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Street Address</label>
+                  <input id="checkout-address" type="text" value="742 Evergreen Terrace" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">City</label>
+                  <input id="checkout-city" type="text" value="Springfield" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">State / Province</label>
+                  <input id="checkout-state" type="text" value="OR" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Postal Code</label>
+                  <input id="checkout-zip" type="text" value="97477" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Country</label>
+                  <select id="checkout-country" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                    <option value="United States">United States</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Germany">Germany</option>
+                    <option value="Canada">Canada</option>
+                    <option value="India">India</option>
+                  </select>
+                </div>
+              </div>
+
+              <button onclick="app.setCheckoutStep(2)" class="w-full mt-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition-all">
+                Continue to Delivery Method →
+              </button>
+            </div>
+
+            <!-- Step 2: Delivery Options -->
+            <div id="checkout-step-2" class="space-y-4 hidden">
+              <h4 class="font-bold text-sm text-slate-900 dark:text-white">Select Shipping Method</h4>
+              <div class="space-y-3">
+                <label class="flex items-center justify-between p-3.5 rounded-xl border border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/20 cursor-pointer">
+                  <div class="flex items-center gap-3">
+                    <input type="radio" name="shipping-method" value="Standard Delivery" checked class="accent-indigo-600" />
+                    <div>
+                      <div class="text-xs font-bold text-slate-900 dark:text-white">Standard Delivery (3-5 Business Days)</div>
+                      <div class="text-[11px] text-slate-500">Free on orders above $100</div>
+                    </div>
+                  </div>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Included</span>
+                </label>
+
+                <label class="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 cursor-pointer">
+                  <div class="flex items-center gap-3">
+                    <input type="radio" name="shipping-method" value="Express Air Delivery" class="accent-indigo-600" />
+                    <div>
+                      <div class="text-xs font-bold text-slate-900 dark:text-white">Express Air (1-2 Business Days)</div>
+                      <div class="text-[11px] text-slate-500">Tracked with signature guarantee</div>
+                    </div>
+                  </div>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">+$15.00</span>
+                </label>
+
+                <label class="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 cursor-pointer">
+                  <div class="flex items-center gap-3">
+                    <input type="radio" name="shipping-method" value="Overnight Priority" class="accent-indigo-600" />
+                    <div>
+                      <div class="text-xs font-bold text-slate-900 dark:text-white">Overnight Priority (Next Day by 10 AM)</div>
+                      <div class="text-[11px] text-slate-500">Premium courier direct dispatch</div>
+                    </div>
+                  </div>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">+$30.00</span>
+                </label>
+              </div>
+
+              <div class="flex gap-3 mt-4">
+                <button onclick="app.setCheckoutStep(1)" class="px-4 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-xl">
+                  ← Back
+                </button>
+                <button onclick="app.setCheckoutStep(3)" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition-all">
+                  Continue to Payment →
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 3: Payment Method -->
+            <div id="checkout-step-3" class="space-y-4 hidden">
+              <h4 class="font-bold text-sm text-slate-900 dark:text-white">Payment Method</h4>
+              
+              <!-- Payment Type Selectors -->
+              <div class="grid grid-cols-3 gap-2">
+                <label class="p-2.5 rounded-xl border border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/20 text-center cursor-pointer">
+                  <input type="radio" name="payment-method" value="Credit Card" checked class="hidden" />
+                  <i data-lucide="credit-card" class="w-4 h-4 mx-auto text-indigo-600 mb-1"></i>
+                  <span class="text-[11px] font-bold text-slate-800 dark:text-slate-200">Credit Card</span>
+                </label>
+                <label class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-center cursor-pointer hover:border-slate-300">
+                  <input type="radio" name="payment-method" value="PayPal" class="hidden" />
+                  <i data-lucide="wallet" class="w-4 h-4 mx-auto text-slate-500 mb-1"></i>
+                  <span class="text-[11px] font-bold text-slate-800 dark:text-slate-200">PayPal</span>
+                </label>
+                <label class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-center cursor-pointer hover:border-slate-300">
+                  <input type="radio" name="payment-method" value="Apple Pay" class="hidden" />
+                  <i data-lucide="smartphone" class="w-4 h-4 mx-auto text-slate-500 mb-1"></i>
+                  <span class="text-[11px] font-bold text-slate-800 dark:text-slate-200">Apple Pay</span>
+                </label>
+              </div>
+
+              <!-- Interactive Virtual Card Preview -->
+              <div class="relative w-full h-40 rounded-2xl bg-gradient-to-tr from-indigo-900 via-indigo-700 to-violet-600 text-white p-5 shadow-xl flex flex-col justify-between overflow-hidden">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs font-mono tracking-widest text-indigo-200">NOVA CARD PLATINUM</span>
+                  <i data-lucide="contactless" class="w-5 h-5 text-indigo-200"></i>
+                </div>
+                <div id="preview-card-number" class="font-mono text-base tracking-widest text-indigo-100">
+                  •••• •••• •••• ••••
+                </div>
+                <div class="flex justify-between items-end text-xs">
+                  <div>
+                    <span class="block text-[9px] text-indigo-300 uppercase">Cardholder</span>
+                    <span id="preview-card-holder" class="font-semibold tracking-wide">JANE DOE</span>
+                  </div>
+                  <div>
+                    <span class="block text-[9px] text-indigo-300 uppercase">Expires</span>
+                    <span id="preview-card-expiry" class="font-mono font-semibold">12/28</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card Inputs -->
+              <div class="space-y-3 pt-2">
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Card Number</label>
+                  <input id="card-number" type="text" maxlength="19" placeholder="4532 8920 1200 4829" class="w-full px-3 py-2 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Cardholder Name</label>
+                  <input id="card-holder" type="text" placeholder="JANE DOE" class="w-full px-3 py-2 text-xs uppercase rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" />
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Expiry Date</label>
+                    <input id="card-expiry" type="text" maxlength="5" placeholder="MM/YY" class="w-full px-3 py-2 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Security CVC</label>
+                    <input id="card-cvc" type="password" maxlength="4" placeholder="•••" class="w-full px-3 py-2 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex gap-3 mt-4">
+                <button onclick="app.setCheckoutStep(2)" class="px-4 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-xl">
+                  ← Back
+                </button>
+                <button onclick="app.submitOrder()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2">
+                  <i data-lucide="check-circle" class="w-4 h-4"></i> Complete Order
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Checkout Order Summary -->
+          <div class="md:col-span-5 bg-slate-50 dark:bg-slate-850 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+            <div>
+              <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-3">Order Summary</h4>
+              <div id="checkout-order-items" class="space-y-1 max-h-56 overflow-y-auto pr-1">
+                <!-- Dynamically filled -->
+              </div>
+            </div>
+
+            <div class="space-y-2 text-xs pt-4 border-t border-slate-200 dark:border-slate-700 mt-4">
+              <div class="flex justify-between text-slate-500">
+                <span>Subtotal</span>
+                <span id="checkout-subtotal" class="font-semibold text-slate-800 dark:text-slate-200">$0.00</span>
+              </div>
+              <div class="flex justify-between text-slate-500">
+                <span>Shipping</span>
+                <span id="checkout-shipping" class="font-semibold text-slate-800 dark:text-slate-200">FREE</span>
+              </div>
+              <div class="flex justify-between text-slate-500">
+                <span>Estimated Tax</span>
+                <span id="checkout-tax" class="font-semibold text-slate-800 dark:text-slate-200">$0.00</span>
+              </div>
+              <div class="flex justify-between text-sm font-bold text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-slate-700">
+                <span>Final Total</span>
+                <span id="checkout-total" class="text-indigo-600 dark:text-indigo-400 text-base">$0.00</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Confirmation & Printable Invoice Modal -->
+  <div id="confirmation-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div onclick="app.closeConfirmationModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs no-print"></div>
+    <div class="relative bg-white dark:bg-slate-800 max-w-md w-full rounded-3xl shadow-2xl p-6 md:p-8 z-10 text-center border border-slate-200 dark:border-slate-700">
+      <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="check-circle-2" class="w-10 h-10 stroke-[2.2]"></i>
+      </div>
+      <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Order Confirmed!</h3>
+      <p class="text-xs text-slate-500 mt-1">Thank you for your purchase. We have sent receipt details to your email.</p>
+
+      <div id="confirmation-order-details" class="mt-6">
+        <!-- Filled by app.showOrderConfirmation() -->
+      </div>
+
+      <div class="flex gap-3 no-print">
+        <button onclick="window.print()" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-800 dark:text-slate-200 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
+          <i data-lucide="printer" class="w-4 h-4"></i> Print Receipt
+        </button>
+        <button onclick="app.closeConfirmationModal()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition-colors">
+          Continue Shopping
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Authentication Modal (Sign In / Register) -->
+  <div id="auth-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div onclick="app.closeAuthModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs"></div>
+    <div class="relative bg-white dark:bg-slate-800 max-w-md w-full rounded-3xl shadow-2xl p-6 sm:p-8 z-10 border border-slate-200 dark:border-slate-700">
+      <button onclick="app.closeAuthModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mx-auto mb-3 shadow-md shadow-indigo-600/30">
+          <i data-lucide="lock" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-900 dark:text-white">Account Access</h3>
+        <p class="text-xs text-slate-500 mt-1">Manage your orders, profile, and secure checkout</p>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="flex border-b border-slate-200 dark:border-slate-700 mb-5">
+        <button id="tab-btn-login" onclick="app.switchAuthTab('login')" class="flex-1 py-2.5 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400">
+          Sign In
+        </button>
+        <button id="tab-btn-register" onclick="app.switchAuthTab('register')" class="flex-1 py-2.5 text-xs font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+          Create Account
+        </button>
+      </div>
+
+      <!-- Error Alert Box -->
+      <div id="auth-error-msg" class="hidden mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs text-rose-600 dark:text-rose-400 font-medium"></div>
+
+      <!-- Sign In Form -->
+      <form id="auth-login-form" onsubmit="app.handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
+          <div class="relative">
+            <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              id="login-email" 
+              type="email" 
+              required 
+              placeholder="you@example.com"
+              class="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Password</label>
+          <div class="relative">
+            <i data-lucide="key" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              id="login-password" 
+              type="password" 
+              required 
+              placeholder="••••••••"
+              class="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow-lg shadow-indigo-600/25 transition-all active:scale-95 flex items-center justify-center gap-2">
+          <span>Sign In to Account</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+
+        <p class="text-center text-xs text-slate-500 pt-2">
+          Don't have an account? 
+          <button type="button" onclick="app.switchAuthTab('register')" class="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
+            Register now
+          </button>
+        </p>
+      </form>
+
+      <!-- Register Form -->
+      <form id="auth-register-form" onsubmit="app.handleRegister(event)" class="space-y-3.5 hidden">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
+          <div class="relative">
+            <i data-lucide="user" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              id="register-name" 
+              type="text" 
+              required 
+              placeholder="Jane Doe"
+              class="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
+          <div class="relative">
+            <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              id="register-email" 
+              type="email" 
+              required 
+              placeholder="you@example.com"
+              class="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Password (min. 6 characters)</label>
+          <div class="relative">
+            <i data-lucide="key" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              id="register-password" 
+              type="password" 
+              required 
+              minlength="6"
+              placeholder="••••••••"
+              class="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Confirm Password</label>
+          <div class="relative">
+            <i data-lucide="check" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              id="register-confirm" 
+              type="password" 
+              required 
+              placeholder="••••••••"
+              class="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow-lg shadow-indigo-600/25 transition-all active:scale-95 flex items-center justify-center gap-2">
+          <span>Create My Account</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+
+        <p class="text-center text-xs text-slate-500 pt-2">
+          Already registered? 
+          <button type="button" onclick="app.switchAuthTab('login')" class="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
+            Sign In
+          </button>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Profile Modal -->
+  <div id="profile-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div onclick="app.closeProfileModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs"></div>
+    <div class="relative bg-white dark:bg-slate-800 max-w-sm w-full rounded-3xl shadow-2xl p-6 z-10 border border-slate-200 dark:border-slate-700">
+      <button onclick="app.closeProfileModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
+          <i data-lucide="user" class="w-8 h-8"></i>
+        </div>
+        <h3 id="profile-name" class="text-lg font-bold text-slate-900 dark:text-white">Customer Profile</h3>
+        <p id="profile-email" class="text-xs text-slate-400 mt-0.5">customer@example.com</p>
+        <span id="profile-role" class="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">customer</span>
+      </div>
+
+      <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700/60 mb-5 text-xs space-y-2">
+        <div class="flex justify-between">
+          <span class="text-slate-500">Member Since:</span>
+          <span id="profile-joined" class="font-semibold text-slate-800 dark:text-slate-200">Today</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500">Authentication:</span>
+          <span class="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Secure Session
+          </span>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <button onclick="app.closeProfileModal(); app.openUserOrdersModal();" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-colors">
+          <i data-lucide="package" class="w-4 h-4"></i> View My Orders
+        </button>
+        <button onclick="app.handleLogout()" class="w-full py-2.5 border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-600 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Orders Modal (Protected Account Orders) -->
+  <div id="user-orders-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 sm:p-6">
+    <div onclick="app.closeUserOrdersModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs"></div>
+    <div class="relative bg-white dark:bg-slate-800 max-w-2xl w-full rounded-3xl shadow-2xl z-10 max-h-[85vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700">
+      <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-850">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+            <i data-lucide="package" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white">My Order History</h3>
+            <span class="text-[11px] text-slate-400">Authenticated Purchases & Tracking</span>
+          </div>
+        </div>
+        <button onclick="app.closeUserOrdersModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6">
+        <div id="user-orders-list" class="space-y-4">
+          <!-- Populated dynamically via UI.renderUserOrders() -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Inventory Management Modal -->
+  <div id="admin-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 sm:p-6">
+    <div onclick="app.closeAdminModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs"></div>
+    <div class="relative bg-white dark:bg-slate-800 max-w-4xl w-full rounded-3xl shadow-2xl z-10 max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700">
+      
+      <!-- Admin Header -->
+      <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-850">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+            <i data-lucide="sliders" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">Store Inventory & Management</h3>
+            <span class="text-[11px] text-slate-400">Live Inventory Tracker & Custom Product Manager</span>
+          </div>
+        </div>
+        <button onclick="app.closeAdminModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Admin Tabs Content -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-8">
+        
+        <!-- Add Product Section -->
+        <div class="bg-slate-50 dark:bg-slate-900/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/80">
+          <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+            <i data-lucide="plus-circle" class="w-4 h-4 text-indigo-600"></i> Add New Product to Store
+          </h4>
+          <form onsubmit="app.handleCreateProduct(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Product Title</label>
+              <input id="new-prod-name" type="text" placeholder="e.g. Ergonomic Standing Desk" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Category</label>
+              <select id="new-prod-category" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                <option value="electronics">Electronics & Gadgets</option>
+                <option value="audio">Audio & Sound</option>
+                <option value="wearables">Wearables & Watches</option>
+                <option value="fashion">Fashion & Lifestyle</option>
+                <option value="home">Home & Living</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Price ($ USD)</label>
+              <input id="new-prod-price" type="number" step="0.01" placeholder="99.99" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Initial Stock</label>
+              <input id="new-prod-stock" type="number" value="25" min="1" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Image URL (Unsplash or direct URL)</label>
+              <input id="new-prod-image" type="url" placeholder="https://images.unsplash.com/photo-..." class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800" />
+            </div>
+            <div class="sm:col-span-3">
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Short Tagline</label>
+              <input id="new-prod-tagline" type="text" placeholder="One sentence summary of the product" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800" />
+            </div>
+            <div class="sm:col-span-3">
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Full Description</label>
+              <textarea id="new-prod-desc" rows="2" placeholder="Describe product craftsmanship and specs..." class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"></textarea>
+            </div>
+            <div class="sm:col-span-3">
+              <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-sm">
+                <i data-lucide="plus" class="w-4 h-4"></i> Add to Catalog
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Inventory List -->
+        <div>
+          <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-3">Active Catalog Stock</h4>
+          <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                  <th class="py-3 px-4">Product</th>
+                  <th class="py-3 px-4">Price</th>
+                  <th class="py-3 px-4">Stock Level</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-products-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Orders Tracker -->
+        <div>
+          <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-3">Customer Placed Orders</h4>
+          <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                  <th class="py-3 px-4">Order ID</th>
+                  <th class="py-3 px-4">Customer</th>
+                  <th class="py-3 px-4">Items</th>
+                  <th class="py-3 px-4">Total</th>
+                  <th class="py-3 px-4">Status</th>
+                </tr>
+              </thead>
+              <tbody id="admin-orders-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 mt-20 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <!-- Brand & Description -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <span class="text-lg font-black tracking-tight text-slate-900 dark:text-white">NovaStore</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            Curated precision electronics, lifestyle apparel, and timeless living accessories engineered for modern life.
+          </p>
+          <div class="flex items-center gap-3 text-slate-400">
+            <a href="#" class="hover:text-indigo-600 transition-colors"><i data-lucide="twitter" class="w-4 h-4"></i></a>
+            <a href="#" class="hover:text-indigo-600 transition-colors"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+            <a href="#" class="hover:text-indigo-600 transition-colors"><i data-lucide="github" class="w-4 h-4"></i></a>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">Shop Categories</h4>
+          <ul class="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+            <li><button onclick="app.setCategory('electronics')" class="hover:text-indigo-600 transition-colors">Electronics & Gadgets</button></li>
+            <li><button onclick="app.setCategory('audio')" class="hover:text-indigo-600 transition-colors">Audio & Sound</button></li>
+            <li><button onclick="app.setCategory('wearables')" class="hover:text-indigo-600 transition-colors">Wearables & Watches</button></li>
+            <li><button onclick="app.setCategory('fashion')" class="hover:text-indigo-600 transition-colors">Fashion & Lifestyle</button></li>
+            <li><button onclick="app.setCategory('home')" class="hover:text-indigo-600 transition-colors">Home & Living</button></li>
+          </ul>
+        </div>
+
+        <!-- Customer Care -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">Customer Care</h4>
+          <ul class="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+            <li><a href="#" class="hover:text-indigo-600 transition-colors">Track Order Status</a></li>
+            <li><a href="#" class="hover:text-indigo-600 transition-colors">Shipping & Returns</a></li>
+            <li><a href="#" class="hover:text-indigo-600 transition-colors">Warranty & Guarantee</a></li>
+            <li><a href="#" class="hover:text-indigo-600 transition-colors">Privacy & Terms</a></li>
+            <li><button onclick="app.openAdminModal()" class="hover:text-indigo-600 transition-colors">Merchant Dashboard</button></li>
+          </ul>
+        </div>
+
+        <!-- Newsletter Subscription -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">Stay in the Loop</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Subscribe for exclusive flash sales, private events, and member drops.</p>
+          <form onsubmit="event.preventDefault(); UI.showToast('Thank you for subscribing!', 'success');" class="flex gap-2">
+            <input 
+              type="email" 
+              placeholder="Enter your email" 
+              required 
+              class="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            />
+            <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-colors">
+              Join
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+        <span>© 2026 NovaStore Inc. All rights reserved.</span>
+        <div class="flex items-center gap-4">
+          <span>Accepting Visa, Mastercard, Apple Pay, PayPal</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
