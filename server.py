@@ -13,7 +13,7 @@ import json
 import re
 from urllib.parse import urlparse, parse_qs
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from db.database import Database
+from database import Database
 
 PORT = int(os.environ.get('PORT', 8080))
 HOST = os.environ.get('HOST', '0.0.0.0')
